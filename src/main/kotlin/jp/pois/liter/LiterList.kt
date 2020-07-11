@@ -47,7 +47,7 @@ class LiterList<T>(private val origin: Iterator<T>, private val list: MutableLis
         require(n > 0) { "Argument n must be positive" }
 
         val array = Array<Any?>(n) {
-            if (origin.hasNext()) throw NoSuchElementException()
+            if (!origin.hasNext()) throw NoSuchElementException()
             origin.next()
         }
         hasNext = origin.hasNext()
