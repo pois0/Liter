@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
     kotlin("jvm") version "1.3.72"
@@ -59,10 +59,7 @@ bintray {
             name = project.version.toString().let {
                 if (it[0] == 'v') it.substring(1) else it
             }
-            released = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").let {
-                it.timeZone = TimeZone.getTimeZone("UTC")
-                it.format(Date())
-            }
+            released = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(ZonedDateTime.now())
         }
     }
 }
