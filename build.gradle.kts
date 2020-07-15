@@ -17,14 +17,23 @@
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+val githubUser = "pois0"
+val githubRepository = "Liter"
+
+val bintrayUser = "pois"
+val bintrayRepository = "KotlinLibs"
+
+
+group = "jp.pois"
+version = System.getenv("LITER_VERSION")?.toString()?.let {
+    if (it[0] == 'v') it.substring(1) else it
+} ?: ""
+
 plugins {
     kotlin("jvm") version "1.3.72"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
 }
-
-group = "jp.pois"
-version = System.getenv("LITER_VERSION")
 
 repositories {
     mavenCentral()
@@ -48,7 +57,8 @@ bintray {
     key = System.getenv("BINTRAY_API")
 
     publish = true
-    `override` = true
+
+    setPublications("library")
 
     pkg.apply {
         repo = "KotlinLibs"
@@ -56,28 +66,37 @@ bintray {
         setLicenses("Apache-2.0")
 
         version.apply {
-            name = project.version.toString().let {
-                if (it[0] == 'v') it.substring(1) else it
-            }
+            name = project.version as String
             released = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(ZonedDateTime.now())
         }
     }
 }
 
 publishing {
-    publications.withType<MavenPublication> {
-        pom {
-            name.set(rootProject.name)
-            licenses {
-                license {
-                    name.set("The Apache Software License, Version 2.0")
-                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+    publications {
+        create<MavenPublication>("library") {
+            groupId = project.group as String
+            artifactId = rootProject.name
+            version = project.version as String
+
+            from(components["java"])
+
+            pom {
+                name.set(rootProject.name)
+                licenses {
+                    license {
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
                 }
-            }
-            developers {
-                developer {
-                    name.set("pois")
-                    email.set("dev@pois.jp")
+                developers {
+                    developer {
+                        name.set("pois")
+                        email.set("dev@pois.jp")
+                    }
+                }
+                scm {
+                    url.set("https://giuhtb.com/$githubUser/$githubRepository")
                 }
             }
         }
