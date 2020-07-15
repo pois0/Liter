@@ -22,10 +22,12 @@ val githubRepository = "Liter"
 
 val bintrayUser = "pois"
 val bintrayRepository = "KotlinLibs"
+val bintrayPackage = "Liter"
 
+val rawVersion = System.getenv("LITER_VERSION")
 
 group = "jp.pois"
-version = System.getenv("LITER_VERSION")?.toString()?.let {
+version = rawVersion?.toString()?.let {
     if (it[0] == 'v') it.substring(1) else it
 } ?: ""
 
@@ -62,12 +64,14 @@ bintray {
 
     pkg.apply {
         repo = "KotlinLibs"
-        name = rootProject.name
+        name = bintrayPackage
         setLicenses("Apache-2.0")
 
         version.apply {
             name = project.version as String
             released = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(ZonedDateTime.now())
+            vcsUrl = "https://github.com/pois0/Liter/tree/$rawVersion"
+            vcsTag = rawVersion
         }
     }
 }
