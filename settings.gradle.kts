@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rootProject.name = "Liter"
+rootProject.name = "liter"
 
 pluginManagement {
     repositories {
