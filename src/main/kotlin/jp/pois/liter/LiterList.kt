@@ -16,7 +16,7 @@
 
 package jp.pois.liter
 
-class LiterList<T>(private val origin: Iterator<T>, private val list: MutableList<T>) : List<T> {
+class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableList<T>) : List<T> {
     val savedElements: List<T> = list
 
     internal var hasNext: Boolean = origin.hasNext()

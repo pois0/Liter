@@ -16,21 +16,14 @@
 
 package jp.pois.liter
 
-abstract class LiterMap<K, V> : Map<K, V> {
+abstract class LiterMap<K, V> : AbstractLiterSet<Map.Entry<K, V>, Pair<K, V>>(), Map<K, V> {
     protected val map = LinkedHashMap<K, V>()
     val savedEntries: Map<K, V> = map
 
-    abstract var hasNext: Boolean
-        protected set
+    abstract override var hasNext: Boolean
 
     override val entries: Set<Map.Entry<K, V>>
-        get() {
-            if (hasNext) {
-                readAll()
-            }
-
-            return map.entries
-        }
+        get() = EntrySet()
 
     override val keys: Set<K>
         get() {
@@ -59,8 +52,6 @@ abstract class LiterMap<K, V> : Map<K, V> {
             return map.values
         }
 
-    abstract fun read(): Pair<K, V>?
-
     abstract fun readAll()
 
     abstract fun readValue(key: K): V?
@@ -75,10 +66,32 @@ abstract class LiterMap<K, V> : Map<K, V> {
 
     override fun getOrDefault(key: K, defaultValue: V): V = map[key] ?: readValue(key) ?: defaultValue
 
+    override fun getSavedElementsIterator(): Iterator<Map.Entry<K, V>> = map.entries.iterator()
+
     override fun isEmpty(): Boolean = hasNext || map.isEmpty()
+
+    override fun readE(): Map.Entry<K, V>? = read()?.let { PairEntry(it) }
 
     internal class PairEntry<out K, out V>(pair: Pair<K, V>) : Map.Entry<K, V> {
         override val key: K = pair.first
         override val value: V = pair.second
     }
+
+    internal inner class EntrySet : Set<Map.Entry<K, V>> {
+        override val size: Int
+            get() = this@LiterMap.size
+
+        override fun contains(element: Map.Entry<K, V>): Boolean =
+            map.contains(element.key) || readValue(element.key) == element.value
+
+        override fun containsAll(elements: Collection<Map.Entry<K, V>>): Boolean = elements.all { contains(it) }
+
+        override fun isEmpty(): Boolean = map.isEmpty() || hasNext
+
+        override fun iterator(): Iterator<Map.Entry<K, V>> = LiterIterator()
+    }
 }
+
+fun <K, V> LiterMap<K, V>.toMap(): Map<K, V> = if (isEmpty()) emptyMap() else savedEntries
+
+

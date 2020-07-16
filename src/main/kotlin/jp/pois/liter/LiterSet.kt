@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package jp.pois.liter
 
-class LiterSet<T>(private val origin: Iterator<T>) : Set<T> {
+class LiterSet<T>(internal val origin: Iterator<T>) : AbstractLiterSet<T, T>(), Set<T> {
     private val set = LinkedHashSet<T>()
 
     val savedElements: Set<T> = set
 
-    var hasNext: Boolean = origin.hasNext()
-        private set
+    override var hasNext: Boolean = origin.hasNext()
+
 
     override val size: Int
         get() {
@@ -33,7 +35,7 @@ class LiterSet<T>(private val origin: Iterator<T>) : Set<T> {
             return set.size
         }
 
-    fun read(): T? {
+    override fun read(): T? {
         if (!hasNext) throw NoSuchElementException()
 
         origin.forEach {
@@ -74,35 +76,23 @@ class LiterSet<T>(private val origin: Iterator<T>) : Set<T> {
 
     override fun containsAll(elements: Collection<T>): Boolean = elements.all { contains(it) }
 
+    override fun getSavedElementsIterator(): Iterator<T> = set.iterator()
+
     override fun isEmpty(): Boolean = set.isEmpty() && !hasNext
 
-    override fun iterator(): Iterator<T> = LiterSetIterator()
+    override fun iterator(): Iterator<T> = LiterIterator()
 
-    internal inner class LiterSetIterator : Iterator<T> {
-        private val setIterator = set.iterator()
-        private var nextValue: T? = null
+    override fun readE(): T? = read()
+}
 
-        override fun hasNext(): Boolean {
-            if (setIterator.hasNext()) return true
-            if (!hasNext) return false
+fun <T> Iterator<T>.literSet(): Set<T> = LiterSet(this)
 
-            val next = read()
-            return if (next != null) {
-                nextValue = next
-                true
-            } else false
-        }
-
-        override fun next(): T {
-            return if (setIterator.hasNext()) {
-                setIterator.next()
-            } else {
-                nextValue?.also {
-                    nextValue = null
-                }
-                    ?: read()
-                    ?: throw NoSuchElementException()
-            }
-        }
+fun <T> LiterSet<T>.toSet(): Set<T> {
+    if (hasNext) {
+        readAll()
     }
+
+    if (isEmpty()) return emptySet()
+
+    return savedElements
 }

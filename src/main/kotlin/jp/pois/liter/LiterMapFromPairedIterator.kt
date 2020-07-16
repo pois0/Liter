@@ -16,7 +16,7 @@
 
 package jp.pois.liter
 
-class LiterMapFromPairedIterator<K, V>(private val origin: Iterator<Pair<K, V>>) : LiterMap<K, V>() {
+class LiterMapFromPairedIterator<K, V>(internal val origin: Iterator<Pair<K, V>>) : LiterMap<K, V>() {
     override var hasNext: Boolean = origin.hasNext()
 
     override fun read(): Pair<K, V>? {
@@ -79,3 +79,6 @@ class LiterMapFromPairedIterator<K, V>(private val origin: Iterator<Pair<K, V>>)
 fun <K, V> Iterator<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(this)
 
 fun <K, V> Iterable<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(iterator())
+
+fun <K, V> LiterMapFromPairedIterator<K, V>.toList(): List<Pair<K, V>> = if (isEmpty()) emptyList()
+else LiterList(origin, savedEntries.toList() as MutableList<Pair<K, V>>)
