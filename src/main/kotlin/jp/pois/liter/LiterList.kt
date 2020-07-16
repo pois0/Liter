@@ -39,16 +39,6 @@ class LiterList<T>(private val origin: Iterator<T>, private val list: MutableLis
         return hasNext
     }
 
-    fun readAll() {
-        if (!hasNext) return
-
-        origin.forEach {
-            list.add(it)
-        }
-
-        hasNext = false
-    }
-
     fun read(): T {
         if (!hasNext) throw NoSuchElementException()
 
@@ -72,6 +62,16 @@ class LiterList<T>(private val origin: Iterator<T>, private val list: MutableLis
         list.addAll(array as Array<T>)
 
         return array[n - 1]
+    }
+
+    fun readAll() {
+        if (!hasNext) return
+
+        origin.forEach {
+            list.add(it)
+        }
+
+        hasNext = false
     }
 
     override fun contains(element: T): Boolean = indexOf(element) >= 0
