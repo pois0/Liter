@@ -80,5 +80,7 @@ fun <K, V> Iterator<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = L
 
 fun <K, V> Iterable<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(iterator())
 
-fun <K, V> LiterMapFromPairedIterator<K, V>.toList(): List<Pair<K, V>> = if (isEmpty()) emptyList()
-else LiterList(origin, savedEntries.toList() as MutableList<Pair<K, V>>)
+fun <K, V> Sequence<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(iterator())
+
+fun <K, V> LiterMapFromPairedIterator<K, V>.toList(): List<Pair<K, V>> =
+    if (isEmpty()) emptyList() else LiterList(origin, savedEntries.toList() as MutableList<Pair<K, V>>)

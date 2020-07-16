@@ -85,7 +85,11 @@ class LiterSet<T>(internal val origin: Iterator<T>) : AbstractLiterSet<T, T>(), 
     override fun readE(): T? = read()
 }
 
-fun <T> Iterator<T>.literSet(): Set<T> = LiterSet(this)
+fun <T> Iterator<T>.literSet(): LiterSet<T> = LiterSet(this)
+
+fun <T> Iterable<T>.literSet(): LiterSet<T> = LiterSet(iterator())
+
+fun <T> Sequence<T>.literSet(): LiterSet<T> = LiterSet(iterator())
 
 fun <T> LiterSet<T>.toSet(): Set<T> {
     if (hasNext) {

@@ -22,7 +22,7 @@ val githubRepository = "Liter"
 
 val bintrayUser = "pois"
 val bintrayRepository = "KotlinLibs"
-val bintrayPackage = "Liter"
+val bintrayPackage = "liter"
 
 val rawVersion = System.getenv("LITER_VERSION")
 
@@ -52,6 +52,16 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(sourceSets.main.get().allSource)
+    }
+
+    artifacts {
+        archives(jar)
+        archives(sourcesJar)
+    }
 }
 
 bintray {
@@ -80,10 +90,11 @@ publishing {
     publications {
         create<MavenPublication>("library") {
             groupId = project.group as String
-            artifactId = rootProject.name
+            artifactId = "liter"
             version = project.version as String
 
             from(components["java"])
+            artifact(tasks["sourcesJar"])
 
             pom {
                 name.set(rootProject.name)

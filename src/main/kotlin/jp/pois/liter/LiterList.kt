@@ -187,6 +187,10 @@ fun <T> Iterable<T>.literList(): LiterList<T> = LiterList(iterator())
 
 fun <T> Iterable<T>.literList(list: MutableList<T>) = LiterList(iterator(), list)
 
+fun <T> Sequence<T>.literList(): LiterList<T> = LiterList(iterator())
+
+fun <T> Sequence<T>.literList(list: MutableList<T>) = LiterList(iterator(), list)
+
 fun <T> LiterList<T>.toList(): List<T> {
     readAll()
     return savedElements
