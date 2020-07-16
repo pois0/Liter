@@ -16,7 +16,8 @@
 
 package jp.pois.liter
 
-abstract class LiterMap<K, V> internal constructor(protected val map: MutableMap<K, V>) : Map<K, V> {
+abstract class LiterMap<K, V> : Map<K, V> {
+    protected val map = LinkedHashMap<K, V>()
     val savedEntries: Map<K, V> = map
 
     abstract var hasNext: Boolean
@@ -58,7 +59,7 @@ abstract class LiterMap<K, V> internal constructor(protected val map: MutableMap
             return map.values
         }
 
-    abstract fun read(): Pair<K, V>
+    abstract fun read(): Pair<K, V>?
 
     abstract fun readAll()
 

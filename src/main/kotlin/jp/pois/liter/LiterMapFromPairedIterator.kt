@@ -16,20 +16,21 @@
 
 package jp.pois.liter
 
-class LiterMapFromPairedIterator<K, V>(private val origin: Iterator<Pair<K, V>>, map: MutableMap<K, V>) :
-    LiterMap<K, V>(map) {
+class LiterMapFromPairedIterator<K, V>(private val origin: Iterator<Pair<K, V>>) : LiterMap<K, V>() {
     override var hasNext: Boolean = origin.hasNext()
 
-    constructor(origin: Iterator<Pair<K, V>>) : this(origin, HashMap())
-
-    override fun read(): Pair<K, V> {
+    override fun read(): Pair<K, V>? {
         if (!hasNext) throw NoSuchElementException()
 
-        val next = origin.next()
-        map.putIfAbsent(next.first, next.second)
-        hasNext = origin.hasNext()
+        origin.forEach { next ->
+            if (map.putIfAbsent(next.first, next.second) == null) {
+                hasNext = origin.hasNext()
+                return next
+            }
+        }
 
-        return next
+        hasNext = false
+        return null
     }
 
     override fun readAll() {
@@ -77,10 +78,4 @@ class LiterMapFromPairedIterator<K, V>(private val origin: Iterator<Pair<K, V>>,
 
 fun <K, V> Iterator<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(this)
 
-fun <K, V> Iterator<Pair<K, V>>.literMap(map: MutableMap<K, V>) = LiterMapFromPairedIterator(this, map)
-
 fun <K, V> Iterable<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(iterator())
-
-fun <K, V> Iterable<Pair<K, V>>.literMap(map: MutableMap<K, V>): LiterMapFromPairedIterator<K, V> =
-    LiterMapFromPairedIterator(iterator(), map)
-
