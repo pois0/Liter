@@ -24,7 +24,7 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
 
     override val size: Int
         get() {
-            if (!hasNext) {
+            if (hasNext) {
                 readAll()
             }
 
