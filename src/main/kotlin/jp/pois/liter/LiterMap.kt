@@ -68,7 +68,7 @@ abstract class LiterMap<K, V> : AbstractLiterSet<Map.Entry<K, V>, Pair<K, V>>(),
 
     override fun getSavedElementsIterator(): Iterator<Map.Entry<K, V>> = map.entries.iterator()
 
-    override fun isEmpty(): Boolean = hasNext || map.isEmpty()
+    override fun isEmpty(): Boolean = !hasNext && map.isEmpty()
 
     override fun readE(): Map.Entry<K, V>? = read()?.let { PairEntry(it) }
 

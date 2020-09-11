@@ -78,7 +78,7 @@ class LiterSet<T>(internal val origin: Iterator<T>) : AbstractLiterSet<T, T>(), 
 
     override fun getSavedElementsIterator(): Iterator<T> = set.iterator()
 
-    override fun isEmpty(): Boolean = set.isEmpty() && !hasNext
+    override fun isEmpty(): Boolean = !hasNext && set.isEmpty()
 
     override fun iterator(): Iterator<T> = LiterIterator()
 

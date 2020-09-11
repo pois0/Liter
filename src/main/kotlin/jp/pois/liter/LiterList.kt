@@ -24,20 +24,12 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
 
     override val size: Int
         get() {
-            if (hasNext) {
-                readAll()
-            }
+            if (hasNext) readAll()
 
             return list.size
         }
 
     constructor(origin: Iterator<T>) : this(origin, ArrayList<T>())
-
-    private fun checkNext(): Boolean {
-        val hasNext = origin.hasNext()
-        this.hasNext = hasNext
-        return hasNext
-    }
 
     fun read(): T {
         if (!hasNext) throw NoSuchElementException()
@@ -52,10 +44,20 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
     fun read(n: Int): T {
         require(n > 0) { "Argument n must be positive" }
 
-        val array = Array<Any?>(n) {
-            if (!origin.hasNext()) throw NoSuchElementException()
-            origin.next()
+        val array = Array<Any?>(n) { null }
+
+        for (i in 0 until n) {
+            if (!origin.hasNext()) {
+                hasNext = false
+                @Suppress("UNCHECKED_CAST")
+                list.addAll(array.copyOfRange(0, i) as Array<T>)
+
+                throw NoSuchElementException()
+            }
+
+            array[i] = origin.next()
         }
+
         hasNext = origin.hasNext()
 
         @Suppress("UNCHECKED_CAST")
@@ -80,18 +82,22 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
 
     override fun get(index: Int): T {
         if (index < list.size) return list[index]
-        if (!hasNext) throw NoSuchElementException()
+        if (!hasNext) throw IndexOutOfBoundsException()
 
-        return read(index - list.size + 1)
+        return try {
+            read(index - list.size + 1)
+        } catch (_: NoSuchElementException) {
+            throw IndexOutOfBoundsException()
+        }
     }
 
     override fun indexOf(element: T): Int {
         val index = list.indexOf(element)
-        if (index > 0) return index
+        if (index >= 0) return index
         if (!hasNext) return -1
 
-        while (origin.hasNext()) {
-            val value = read()
+        origin.forEach { value ->
+            list.add(value)
             if (value == element) {
                 hasNext = origin.hasNext()
                 return list.lastIndex
@@ -102,23 +108,13 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
         return -1
     }
 
-    override fun isEmpty(): Boolean = hasNext || list.isEmpty()
+    override fun isEmpty(): Boolean = !hasNext && list.isEmpty()
 
     override fun iterator(): Iterator<T> = if (hasNext) LiterListIterator() else list.iterator()
 
     override fun lastIndexOf(element: T): Int {
-        if (!hasNext) return list.lastIndexOf(element)
-
-        var current = list.size
-        var last = list.lastIndexOf(element)
-        while (origin.hasNext()) {
-            val next = origin.next()
-            if (next == element) last = current
-            current++
-        }
-
-        hasNext = false
-        return last
+        if (hasNext) readAll()
+        return list.lastIndexOf(element)
     }
 
     override fun listIterator(): ListIterator<T> = if (hasNext) LiterListListIterator() else list.listIterator()
@@ -127,12 +123,16 @@ class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableLi
         if (hasNext) LiterListListIterator(index) else list.listIterator(index)
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
-        if (hasNext) {
-            require(fromIndex in 0 until toIndex)
+        require(fromIndex in 0 until toIndex)
 
-            val mustRead = toIndex - list.lastIndex
-            if (mustRead > 0) {
-                read(toIndex - list.lastIndex)
+        val mustRead = toIndex - list.lastIndex
+        if (mustRead > 0) {
+            if (!hasNext) throw IndexOutOfBoundsException()
+
+            try {
+                read(mustRead)
+            } catch (_: NoSuchElementException) {
+                throw IndexOutOfBoundsException()
             }
         }
 
