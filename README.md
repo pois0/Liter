@@ -1,6 +1,6 @@
 # Liter
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.72-orange.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.4.10-orange.svg)](https://kotlinlang.org)
 [ ![Download](https://api.bintray.com/packages/pois/KotlinLibs/liter/images/download.svg) ](https://bintray.com/pois/KotlinLibs/liter/_latestVersion)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
