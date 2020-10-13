@@ -16,6 +16,8 @@
 
 package jp.pois.liter
 
+import kotlin.experimental.ExperimentalTypeInference
+
 class LiterMapFromPairedIterator<K, V>(internal val origin: Iterator<Pair<K, V>>) : LiterMap<K, V>() {
     override var hasNext: Boolean = origin.hasNext()
 
@@ -84,3 +86,8 @@ fun <K, V> Sequence<Pair<K, V>>.literMap(): LiterMapFromPairedIterator<K, V> = L
 
 fun <K, V> LiterMapFromPairedIterator<K, V>.toList(): List<Pair<K, V>> =
     if (isEmpty()) emptyList() else LiterList(origin, savedEntries.toList() as MutableList<Pair<K, V>>)
+
+@OptIn(ExperimentalTypeInference::class)
+fun <K, V> buildLiterMap(
+    @BuilderInference block: suspend SequenceScope<Pair<K, V>>.() -> Unit
+): LiterMapFromPairedIterator<K, V> = LiterMapFromPairedIterator(iterator(block))

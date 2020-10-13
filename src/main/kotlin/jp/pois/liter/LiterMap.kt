@@ -93,5 +93,3 @@ abstract class LiterMap<K, V> : AbstractLiterSet<Map.Entry<K, V>, Pair<K, V>>(),
 }
 
 fun <K, V> LiterMap<K, V>.toMap(): Map<K, V> = if (isEmpty()) emptyMap() else savedEntries
-
-

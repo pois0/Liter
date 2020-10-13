@@ -18,6 +18,8 @@
 
 package jp.pois.liter
 
+import kotlin.experimental.ExperimentalTypeInference
+
 class LiterSet<T>(internal val origin: Iterator<T>) : AbstractLiterSet<T, T>(), Set<T> {
     private val set = LinkedHashSet<T>()
 
@@ -100,3 +102,8 @@ fun <T> LiterSet<T>.toSet(): Set<T> {
 
     return savedElements
 }
+
+@OptIn(ExperimentalTypeInference::class)
+fun <T> buildLiterSet(
+    @BuilderInference block: suspend SequenceScope<T>.() -> Unit
+): LiterSet<T> = LiterSet(iterator(block))

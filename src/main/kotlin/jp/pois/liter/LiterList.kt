@@ -16,6 +16,8 @@
 
 package jp.pois.liter
 
+import kotlin.experimental.ExperimentalTypeInference
+
 class LiterList<T>(internal val origin: Iterator<T>, private val list: MutableList<T>) : List<T> {
     val savedElements: List<T> = list
 
@@ -196,4 +198,7 @@ fun <T> LiterList<T>.toList(): List<T> {
     return savedElements
 }
 
-
+@OptIn(ExperimentalTypeInference::class)
+fun <T> buildLiterList(
+    @BuilderInference block: suspend SequenceScope<T>.() -> Unit
+): LiterList<T> = LiterList(iterator(block))
